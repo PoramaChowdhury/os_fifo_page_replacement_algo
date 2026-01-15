@@ -1,5 +1,6 @@
-import 'package:fifo_page_replacemnt/auth_screen.dart';
-import 'package:fifo_page_replacemnt/fifo_home.dart';
+
+import 'package:fifo_page_replacemnt/auth_service.dart';
+
 import 'package:flutter/material.dart';
 
 class FifoApp extends StatelessWidget {
@@ -9,7 +10,7 @@ class FifoApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(brightness: Brightness.dark, primaryColor: const Color(0xFF00E5FF)),
-      home: const FifoHome() ,
+      home: const AuthGate(),
     );
   }
 }
