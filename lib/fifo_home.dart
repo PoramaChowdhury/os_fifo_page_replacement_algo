@@ -1,337 +1,230 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+
+class _FifoStep {
+  final int page;
+  final List<int?> frames;
+  final bool isHit;
+  _FifoStep({required this.page, required this.frames, required this.isHit});
+}
 
 class FifoHome extends StatefulWidget {
   const FifoHome({super.key});
-
   @override
   State<FifoHome> createState() => _FifoHomeState();
 }
 
-class _FifoHomeState extends State<FifoHome>
-    with SingleTickerProviderStateMixin {
+class _FifoHomeState extends State<FifoHome> with TickerProviderStateMixin {
   final TextEditingController pageController = TextEditingController();
-  final TextEditingController customFrameController = TextEditingController();
-
-  int selectedFrames = 3;
-  bool useCustom = false;
+  final TextEditingController frameController = TextEditingController();
 
   List<_FifoStep> allSteps = [];
   List<_FifoStep> visibleSteps = [];
-
   int currentStep = 0;
   Timer? playTimer;
+  bool isPlaying = false;
 
-  late TabController tabController;
+  // Modern Color Palette
+  final Color primaryColor = const Color(0xFF00E5FF); // Neon Cyan
+  final Color bgDark = const Color(0xFF0D1117);     // GitHub Dark
+  final Color glassColor = Colors.white.withOpacity(0.05);
 
-  @override
-  void initState() {
-    super.initState();
-    tabController = TabController(length: 4, vsync: this);
-  }
-
-  // ================= FIFO LOGIC =================
   void calculateFIFO() {
-    final pages = pageController.text
-        .trim()
-        .split(RegExp(r'\s+'))
-        .map(int.parse)
-        .toList();
-
-    final frameCount =
-    useCustom ? int.parse(customFrameController.text) : selectedFrames;
+    if (pageController.text.isEmpty || frameController.text.isEmpty) return;
+    final pages = pageController.text.trim().split(RegExp(r'\s+')).map(int.parse).toList();
+    final frameCount = int.tryParse(frameController.text) ?? 3;
 
     List<int?> frames = List.filled(frameCount, null);
     int pointer = 0;
-
     allSteps.clear();
     visibleSteps.clear();
     currentStep = 0;
 
     for (int page in pages) {
       bool hit = frames.contains(page);
-
       if (!hit) {
         frames[pointer] = page;
         pointer = (pointer + 1) % frameCount;
       }
-
-      allSteps.add(
-        _FifoStep(
-          page: page,
-          frames: List.from(frames),
-          isHit: hit,
-        ),
-      );
+      allSteps.add(_FifoStep(page: page, frames: List.from(frames), isHit: hit));
     }
-
-    setState(() {});
-  }
-
-  // ================= CONTROLS =================
-  void startSimulation() {
-    visibleSteps.clear();
-    currentStep = 0;
     setState(() {});
   }
 
   void nextStep() {
     if (currentStep < allSteps.length) {
-      visibleSteps.add(allSteps[currentStep]);
-      currentStep++;
-      setState(() {});
+      setState(() {
+        visibleSteps.add(allSteps[currentStep]);
+        currentStep++;
+      });
     }
   }
 
-  void previousStep() {
-    if (visibleSteps.isNotEmpty) {
-      visibleSteps.removeLast();
-      currentStep--;
-      setState(() {});
-    }
-  }
-
-  void playSimulation() {
-    playTimer?.cancel();
-    playTimer = Timer.periodic(const Duration(milliseconds: 700), (timer) {
-      if (currentStep >= allSteps.length) {
-        timer.cancel();
-      } else {
-        nextStep();
-      }
-    });
-  }
-
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
+    int hits = visibleSteps.where((s) => s.isHit).length;
+    int misses = visibleSteps.where((s) => !s.isHit).length;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF1F4),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            _inputCard(),
-            const SizedBox(height: 20),
-            _controlButtons(),
-            const SizedBox(height: 20),
-            if (visibleSteps.isNotEmpty) ...[
-              _resultTabs(),
-              SizedBox(
-                height: 400,
-                child: TabBarView(
-                  controller: tabController,
-                  children: [
-                    _fifoTable(),
-                    _hitMissView(),
-                    _statsView(),
-                    _sequenceView(),
-                  ],
-                ),
-              ),
-            ]
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ================= INPUT CARD =================
-  Widget _inputCard() {
-    return Container(
-      width: 900,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 15),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "FIFO Page Replacement",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: bgDark,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topLeft,
+            colors: [primaryColor.withOpacity(0.1), bgDark],
+            radius: 1.5,
           ),
-          const SizedBox(height: 20),
-          const Text("Page Reference String"),
-          TextField(
-            controller: pageController,
-            decoration: const InputDecoration(
-              hintText: "Enter pages (e.g. 1 2 3 4)",
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text("No. of Frames"),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              for (int i = 1; i <= 5; i++)
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedFrames = i;
-                      useCustom = false;
-                    });
-                  },
-                  child: _frameBox(i, selectedFrames == i && !useCustom),
-                ),
-              const SizedBox(width: 20),
-              Checkbox(
-                value: useCustom,
-                onChanged: (v) => setState(() => useCustom = v!),
-              ),
-              const Text("Custom"),
-              const SizedBox(width: 10),
-              SizedBox(
-                width: 60,
-                child: TextField(
-                  controller: customFrameController,
-                  enabled: useCustom,
-                  keyboardType: TextInputType.number,
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: calculateFIFO,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF4D6D),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-              ),
-              child: const Text("Calculate"),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _frameBox(int value, bool selected) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      width: 38,
-      height: 38,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? const Color(0xFFFF4D6D) : Colors.white,
-        border: Border.all(),
-      ),
-      child: Text(
-        "$value",
-        style: TextStyle(
-          color: selected ? Colors.white : Colors.black,
-          fontWeight: FontWeight.bold,
         ),
-      ),
-    );
-  }
-
-  // ================= CONTROL BUTTONS =================
-  Widget _controlButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: startSimulation,
-          child: const Text("Start Simulation"),
-        ),
-        const SizedBox(width: 10),
-        ElevatedButton(
-          onPressed: previousStep,
-          child: const Text("Previous Step"),
-        ),
-        const SizedBox(width: 10),
-        ElevatedButton(
-          onPressed: nextStep,
-          child: const Text("Next Step"),
-        ),
-        const SizedBox(width: 10),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-          onPressed: playSimulation,
-          child: const Text("Play"),
-        ),
-      ],
-    );
-  }
-
-  // ================= RESULT =================
-  Widget _resultTabs() {
-    return TabBar(
-      controller: tabController,
-      labelColor: const Color(0xFFFF4D6D),
-      tabs: const [
-        Tab(text: "FIFO Table"),
-        Tab(text: "Hit/Miss"),
-        Tab(text: "Stats"),
-        Tab(text: "Sequence"),
-      ],
-    );
-  }
-
-  Widget _fifoTable() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Table(
-        border: TableBorder.all(),
-        defaultColumnWidth: const FixedColumnWidth(50),
-        children: [
-          TableRow(
-            children: [
-              const Center(child: Text("Page")),
-              ...visibleSteps.map((e) => Center(child: Text("${e.page}"))),
-            ],
-          ),
-          for (int i = 0; i < visibleSteps.first.frames.length; i++)
-            TableRow(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
               children: [
-                Center(child: Text("F${i + 1}")),
-                ...visibleSteps.map(
-                      (e) => Center(child: Text(e.frames[i]?.toString() ?? "")),
-                ),
+                _buildHeader(),
+                const SizedBox(height: 20),
+                _buildInputSection(),
+                const SizedBox(height: 20),
+                _buildStats(hits, misses),
+                const SizedBox(height: 20),
+                Expanded(child: _buildVisualizer()),
+                _buildControls(),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return const Column(
+      children: [
+        Text("MEMORY KERNEL V2.0", style: TextStyle(color: Colors.white, letterSpacing: 4, fontWeight: FontWeight.bold)),
+        Text("FIFO Page Replacement Simulator", style: TextStyle(color: Colors.white54, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildInputSection() {
+    return _glassMorphicContainer(
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: TextField(
+              controller: pageController,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration("Page String (e.g. 7 0 1 2)"),
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: TextField(
+              controller: frameController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration("Frames"),
+            ),
+          ),
+          const SizedBox(width: 15),
+          ElevatedButton(
+            onPressed: calculateFIFO,
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor, foregroundColor: Colors.black),
+            child: const Text("INITIALIZE"),
+          ),
         ],
       ),
     );
   }
 
-  Widget _hitMissView() => Wrap(
-    children: visibleSteps
-        .map((e) => Chip(label: Text(e.isHit ? "H" : "M")))
-        .toList(),
+  Widget _buildStats(int hits, int misses) {
+    double ratio = visibleSteps.isEmpty ? 0 : (hits / visibleSteps.length) * 100;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _statTile("HITS", hits.toString(), Colors.greenAccent),
+        _statTile("MISSES", misses.toString(), Colors.redAccent),
+        _statTile("RATIO", "${ratio.toStringAsFixed(1)}%", primaryColor),
+      ],
+    );
+  }
+
+  Widget _buildVisualizer() {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: visibleSteps.length,
+      itemBuilder: (context, index) {
+        final step = visibleSteps[index];
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
+          margin: const EdgeInsets.only(right: 12),
+          width: 80,
+          child: Column(
+            children: [
+              CircleAvatar(backgroundColor: step.isHit ? Colors.green : Colors.red, radius: 15, child: Text(step.isHit ? "H" : "M", style: const TextStyle(fontSize: 10, color: Colors.white))),
+              const SizedBox(height: 10),
+              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: primaryColor.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text(step.page.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+              const SizedBox(height: 10),
+              ...step.frames.map((f) => Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                height: 40,
+                width: 60,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(border: Border.all(color: Colors.white24), borderRadius: BorderRadius.circular(4), color: f == step.page ? primaryColor.withOpacity(0.4) : Colors.transparent),
+                child: Text(f?.toString() ?? "-", style: const TextStyle(color: Colors.white70)),
+              )),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildControls() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(onPressed: () => setState(() => visibleSteps.clear()), icon: const Icon(Icons.refresh, color: Colors.white)),
+          const SizedBox(width: 20),
+          FloatingActionButton.extended(
+            onPressed: nextStep,
+            label: const Text("NEXT CYCLE"),
+            icon: const Icon(Icons.arrow_forward_ios),
+            backgroundColor: primaryColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _glassMorphicContainer({required Widget child}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(color: glassColor, borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white10)),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) => InputDecoration(
+    labelText: label,
+    labelStyle: const TextStyle(color: Colors.white54, fontSize: 12),
+    enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: primaryColor)),
   );
 
-  Widget _statsView() => Padding(
-    padding: const EdgeInsets.all(20),
-    child: Text(
-        "Hits: ${visibleSteps.where((e) => e.isHit).length} | Misses: ${visibleSteps.where((e) => !e.isHit).length}"),
+  Widget _statTile(String label, String value, Color color) => Column(
+    children: [
+      Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+      Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold)),
+    ],
   );
-
-  Widget _sequenceView() => Wrap(
-    children: visibleSteps
-        .map((e) => Text(e.isHit ? "H " : "M ",
-        style: const TextStyle(fontSize: 18)))
-        .toList(),
-  );
-}
-
-// ================= MODEL =================
-class _FifoStep {
-  final int page;
-  final List<int?> frames;
-  final bool isHit;
-
-  _FifoStep({
-    required this.page,
-    required this.frames,
-    required this.isHit,
-  });
 }
