@@ -122,6 +122,7 @@ class _FifoHomeState extends State<FifoHome> {
       ),
     );
   }
+
   /*void calculateFIFO() {
     if (_pageController.text.isEmpty || _frameController.text.isEmpty) return;
     final pages = _pageController.text
@@ -160,7 +161,11 @@ class _FifoHomeState extends State<FifoHome> {
   }*/
   void calculateFIFO() {
     if (_pageController.text.isEmpty || _frameController.text.isEmpty) return;
-    final pages = _pageController.text.trim().split(RegExp(r'\s+')).map(int.parse).toList();
+    final pages = _pageController.text
+        .trim()
+        .split(RegExp(r'\s+'))
+        .map(int.parse)
+        .toList();
     final frameCount = int.tryParse(_frameController.text) ?? 3;
     List<int?> frames = List.filled(frameCount, null);
     int pointer = 0;
@@ -181,19 +186,22 @@ class _FifoHomeState extends State<FifoHome> {
         if (evictedPage == null) {
           status = "MISS: Filling empty slot with Page $page.";
         } else {
-          status = "Replace Done:   Previous Page $evictedPage ➔ New Page $page.";
+          status =
+              "Replace Done:   Previous Page $evictedPage ➔ New Page $page.";
         }
 
         frames[pointer] = page;
         pointer = (pointer + 1) % frameCount;
       }
 
-      allSteps.add(_FifoStep(
-        page: page,
-        frames: List.from(frames),
-        isHit: hit,
-        log: status,
-      ));
+      allSteps.add(
+        _FifoStep(
+          page: page,
+          frames: List.from(frames),
+          isHit: hit,
+          log: status,
+        ),
+      );
     }
     setState(() => replacementLog = "READY: Detailed Analysis Loaded");
     saveHistory();
@@ -250,7 +258,6 @@ class _FifoHomeState extends State<FifoHome> {
     });
   }
 
-
   void _scrollToEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_horizontalController.hasClients) {
@@ -295,7 +302,6 @@ class _FifoHomeState extends State<FifoHome> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -432,71 +438,88 @@ class _FifoHomeState extends State<FifoHome> {
     ],
   );
 
-  Widget _buildInputPanel() => _glassContainer(
-    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Large Page Sequence Field
-          Expanded(
-            flex: 4,
-
-            child: TextFormField(
-              controller: _pageController,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9\s]')),
-              ],
-              style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w500),
-              decoration: _inputStyle("PAGE STRING (Ex - 1 2 4 6 9)"),
-              validator: (value) {
-                if (value == null || value.isEmpty) return "Please enter numbers";
-                if (RegExp(r'[a-zA-Z]').hasMatch(value)) {
-                  return "Pass numbers only";
-                }
-                return null;
-              },
+  Widget _buildInputPanel() => Form(
+    key: _formKey,
+    child: _glassContainer(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          // Changed to start for error space
+          children: [
+            Expanded(
+              flex: 4,
+              child: TextFormField(
+                controller: _pageController,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9\s]')),
+                ],
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: _inputStyle("PAGE STRING (Ex - 1 2 4 6 9)"),
+                // --- ADDED VALIDATOR ---
+                validator: (value) {
+                  if (value == null || value.isEmpty)
+                    return "Please enter numbers";
+                  // If they bypassed the formatter somehow or for logic check:
+                  if (RegExp(r'[a-zA-Z]').hasMatch(value)) {
+                    return "Pass numbers only";
+                  }
+                  return null;
+                },
+              ),
             ),
-          ),
-          const SizedBox(width: 20),
-          // Large Frame Count Field
-          Expanded(
-            child: TextField(
-              controller: _frameController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w500),
-              decoration: _inputStyle("FRAMES"),
+            const SizedBox(width: 20),
+            Expanded(
+              child: TextFormField(
+                // Changed to TextFormField to use validator
+                controller: _frameController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: _inputStyle("FRAMES"),
+                validator: (value) =>
+                    (value == null || value.isEmpty) ? "Required" : null,
+              ),
             ),
-          ),
-          const SizedBox(width: 15),
-          // High-Impact Action Buttons
-          _buildLargeActionButton(
+            const SizedBox(width: 15),
+            _buildLargeActionButton(
               icon: Icons.bolt,
               color: primaryColor,
-              onPressed: (){if (_formKey.currentState!.validate()) {
-                calculateFIFO();
-              }},
-              tooltip: "Run Simulator"
-          ),
-          const SizedBox(width: 10),
-          _buildLargeActionButton(
+              onPressed: () {
+                // TRIGGER VALIDATION
+                if (_formKey.currentState!.validate()) {
+                  calculateFIFO();
+                }
+              },
+              tooltip: "Run Simulator",
+            ),
+            const SizedBox(width: 10),
+            _buildLargeActionButton(
               icon: Icons.refresh_rounded,
               color: Colors.redAccent,
               onPressed: clearAll,
-              tooltip: "System Reset"
-          ),
-        ],
+              tooltip: "System Reset",
+            ),
+          ],
+        ),
       ),
     ),
   );
 
-// Helper for larger Action Buttons
   Widget _buildLargeActionButton({
     required IconData icon,
     required Color color,
     required VoidCallback onPressed,
-    required String tooltip
+    required String tooltip,
   }) {
     return Tooltip(
       message: tooltip,
@@ -514,10 +537,14 @@ class _FifoHomeState extends State<FifoHome> {
     );
   }
 
-// Updated Input Style for "Large" Look
+  // Updated Input Style for "Large" Look
   InputDecoration _inputStyle(String label) => InputDecoration(
     labelText: label,
-    labelStyle: TextStyle(color: Colors.white38, fontSize: 13, letterSpacing: 1.2),
+    labelStyle: TextStyle(
+      color: Colors.white38,
+      fontSize: 13,
+      letterSpacing: 1.2,
+    ),
     contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
     floatingLabelBehavior: FloatingLabelBehavior.auto,
     enabledBorder: OutlineInputBorder(
@@ -531,7 +558,6 @@ class _FifoHomeState extends State<FifoHome> {
     filled: true,
     fillColor: Colors.white.withOpacity(0.02),
   );
-
 
   Widget _buildStatusBanner() => Container(
     width: double.infinity,
@@ -710,6 +736,4 @@ class _FifoHomeState extends State<FifoHome> {
           ),
         ),
       );
-
-
 }
