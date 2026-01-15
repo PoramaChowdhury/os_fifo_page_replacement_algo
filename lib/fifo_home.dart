@@ -25,9 +25,9 @@ class _FifoHomeState extends State<FifoHome> with TickerProviderStateMixin {
   Timer? playTimer;
   bool isPlaying = false;
 
-  // Modern Color Palette
-  final Color primaryColor = const Color(0xFF00E5FF); // Neon Cyan
-  final Color bgDark = const Color(0xFF0D1117);     // GitHub Dark
+
+  final Color primaryColor = const Color(0xFF00E5FF);
+  final Color bgDark = const Color(0xFF0D1117);
   final Color glassColor = Colors.white.withOpacity(0.05);
 
   void calculateFIFO() {
