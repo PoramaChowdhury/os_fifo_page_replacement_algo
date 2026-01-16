@@ -10,7 +10,7 @@ class FifoDialogs {
         child: AlertDialog(
           backgroundColor: Colors.black87,
           title: Text(
-            "SYSTEM GUIDE",
+            "User Guide For New User ",
             style: TextStyle(
               color: primaryColor,
               letterSpacing: 2,
@@ -18,7 +18,7 @@ class FifoDialogs {
             ),
           ),
           content: const Text(
-            "1. Set Page String & Frames\n2. Click INITIALIZE\n3. Use centered media keys to control the memory cycle.",
+            "1. Set Page String & Frames\n 2. Click INITIALIZE\n 3. Use centered media keys to control the memory cycle.",
             style: TextStyle(fontSize: 15),
           ),
           actions: [

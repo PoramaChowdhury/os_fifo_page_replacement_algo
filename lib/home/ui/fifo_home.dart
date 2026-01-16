@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:fifo_page_replacemnt/database_service.dart';
-import 'package:fifo_page_replacemnt/fifo_dialog_tutorial.dart';
-import 'package:fifo_page_replacemnt/fifo_history_sheet.dart';
-import 'package:fifo_page_replacemnt/fifo_inputPanel.dart';
-import 'package:fifo_page_replacemnt/fifo_logic.dart';
-import 'package:fifo_page_replacemnt/fifo_memory.dart';
-import 'package:fifo_page_replacemnt/fifo_model.dart';
-import 'package:fifo_page_replacemnt/fifo_stats_dashboard_widgets.dart';
+import 'package:fifo_page_replacemnt/database/database_service.dart';
+import 'package:fifo_page_replacemnt/home/widgets/fifo_dialog_tutorial.dart';
+import 'package:fifo_page_replacemnt/home/widgets/fifo_history_sheet.dart';
+import 'package:fifo_page_replacemnt/home/widgets/fifo_inputPanel.dart';
+import 'package:fifo_page_replacemnt/fifo%20calculator/fifo_logic.dart';
+import 'package:fifo_page_replacemnt/home/widgets/fifo_memory.dart';
+import 'package:fifo_page_replacemnt/model/fifo_model.dart';
+import 'package:fifo_page_replacemnt/home/widgets/fifo_stats_dashboard_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'fifo_widgets.dart';
+import '../widgets/fifo_widgets.dart';
 
 
 class FifoHome extends StatefulWidget {

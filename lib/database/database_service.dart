@@ -1,4 +1,4 @@
-import 'package:fifo_page_replacemnt/fifo_model.dart';
+import 'package:fifo_page_replacemnt/model/fifo_model.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,7 +34,7 @@ class DatabaseService {
         'data': stepsData,
       });
 
-      return "SYNCED TO Database";
+      return "Saved In Database";
     } catch (e) {
       debugPrint("Save failed: $e");
       return "SYNC ERROR: Could not save data";

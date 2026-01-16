@@ -1,4 +1,4 @@
-import 'package:fifo_page_replacemnt/fifo_model.dart';
+import 'package:fifo_page_replacemnt/model/fifo_model.dart';
 import 'package:flutter/material.dart';
 import 'fifo_widgets.dart';
 
@@ -21,7 +21,6 @@ class FifoMemoryGrid extends StatelessWidget {
         child: Text("SYSTEM IDLE", style: TextStyle(color: Colors.white10)),
       );
     }
-
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: FifoWidgets.glassContainer(
@@ -47,7 +46,6 @@ class FifoMemoryGrid extends StatelessWidget {
       margin: const EdgeInsets.only(right: 15),
       child: Column(
         children: [
-
           Text(
             step.isHit ? "HIT" : "MISS",
             style: TextStyle(
@@ -76,7 +74,6 @@ class FifoMemoryGrid extends StatelessWidget {
 
   Widget _buildFrameBox(int? f, FifoStep step) {
     final bool isNewlyAdded = f == step.page && !step.isHit;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 5),
       height: 35,

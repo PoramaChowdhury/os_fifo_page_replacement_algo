@@ -68,7 +68,7 @@ class _AuthScreenState extends State<AuthScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isLogin ? "Login" : "New Here",
+                  isLogin ? "Login" : "New Here? Sign Up",
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -78,8 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: _email,
-
-                  decoration: const InputDecoration(labelText: "EMAIL",labelStyle:const TextStyle(fontSize: 16, color: Colors.white) ),
+                  decoration: const InputDecoration(labelText: "Email",labelStyle:const TextStyle(fontSize: 16, color: Colors.white) ),
                 ),
                 TextField(
                   controller: _pass,

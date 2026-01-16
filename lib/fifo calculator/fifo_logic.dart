@@ -1,4 +1,4 @@
-import 'package:fifo_page_replacemnt/fifo_model.dart';
+import 'package:fifo_page_replacemnt/model/fifo_model.dart';
 
 
 class FifoLogic {
