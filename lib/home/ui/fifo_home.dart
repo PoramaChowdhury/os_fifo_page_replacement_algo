@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:fifo_page_replacemnt/database/database_service.dart';
+import 'package:fifo_page_replacemnt/home/widgets/fifo_video_tutorial.dart';
 import 'package:fifo_page_replacemnt/home/widgets/fifo_dialog_tutorial.dart';
 import 'package:fifo_page_replacemnt/home/widgets/fifo_history_sheet.dart';
 import 'package:fifo_page_replacemnt/home/widgets/fifo_inputPanel.dart';
@@ -250,10 +251,29 @@ class _FifoHomeState extends State<FifoHome> {
             ),
           ],
         ),
-        IconButton(
-
-          icon: const Icon(Icons.logout, color: Colors.white70),
-          onPressed: () => Supabase.instance.client.auth.signOut(),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.play_circle_outline,
+                color: Colors.white70,
+              ),
+              tooltip: "FIFO Video Tutorial",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const FifoVideoTutorial(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white70),
+              onPressed: () =>
+                  Supabase.instance.client.auth.signOut(),
+            ),
+          ],
         ),
       ],
     ),
