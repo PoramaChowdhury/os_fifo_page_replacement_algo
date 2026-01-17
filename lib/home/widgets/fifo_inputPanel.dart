@@ -37,12 +37,8 @@ class FifoInputPanel extends StatelessWidget {
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9\s]')),
                 ],
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: _inputStyle("PAGE STRING (Ex - 1 2 4 6 9)"),
+                decoration: const InputDecoration(
+                  labelText: "PAGE STRING (Ex - 1 2 4 6 9)"),
                 validator: (val) =>
                 (val == null || val.isEmpty) ? "Please enter numbers" : null,
               ),
@@ -54,12 +50,9 @@ class FifoInputPanel extends StatelessWidget {
                 controller: frameController,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: _inputStyle("FRAMES"),
+
+                decoration: const InputDecoration(
+                    labelText: "Frames"),
                 validator: (val) =>
                 (val == null || val.isEmpty) ? "Required" : null,
               ),
@@ -86,23 +79,23 @@ class FifoInputPanel extends StatelessWidget {
     );
   }
 
-  InputDecoration _inputStyle(String label) => InputDecoration(
-    labelText: label,
-    labelStyle: const TextStyle(
-      color: Colors.white38,
-      fontSize: 13,
-      letterSpacing: 1.2,
-    ),
-    contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-    enabledBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Colors.white10),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: primaryColor, width: 2),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    filled: true,
-    fillColor: Colors.white.withOpacity(0.02),
-  );
+  // InputDecoration _inputStyle(String label) => InputDecoration(
+  //   labelText: label,
+  //   labelStyle: const TextStyle(
+  //     color: Colors.white38,
+  //     fontSize: 13,
+  //     letterSpacing: 1.2,
+  //   ),
+  //   contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+  //   enabledBorder: OutlineInputBorder(
+  //     borderSide: const BorderSide(color: Colors.white10),
+  //     borderRadius: BorderRadius.circular(12),
+  //   ),
+  //   focusedBorder: OutlineInputBorder(
+  //     borderSide: BorderSide(color: primaryColor, width: 2),
+  //     borderRadius: BorderRadius.circular(12),
+  //   ),
+  //   filled: true,
+  //   fillColor: Colors.white.withOpacity(0.02),
+  // );
 }
