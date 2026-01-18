@@ -1,16 +1,48 @@
-# fifo_page_replacemnt
+OS FIFO Page Replacement Algorithm
+Project Overview
+This project is a visualization and implementation of the First-In-First-Out (FIFO) Page Replacement Algorithm, a fundamental concept in operating systems memory management. Built with Flutter for a cross-platform experience and integrated with Supabase for backend services, it provides an interactive way to understand how an OS handles page faults and memory frames.
+​
+​
 
-A new Flutter project.
+Multi-Platform Access
+The project is available across multiple platforms, with dedicated branches for different build versions. You can access the live web application or download the desktop versions from their respective branches.
+​
 
-## Getting Started
+Platform	Access Link / Branch
+Live Web App	Live Website 
+​
+Web Source	web-relese branch 
+​
+Windows App	windows-release branch 
+​
+Mobile Build	mobile branch 
+​
+Key Features
+FIFO Algorithm Simulation: Accurately simulates page replacement logic and frame transitions.
+​
 
-This project is a starting point for a Flutter application.
+Supabase Integration: Utilizes Supabase for real-time data management and potential user authentication.
+​
 
-A few resources to get you started if this is your first Flutter project:
+Interactive UI: Features a dynamic visualization of the memory frame status as page requests are processed.
+​
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Cross-Platform Support: Fully compatible with Web, Windows Desktop, and Mobile environments.
+​
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+How to Run Locally
+To run this project on your machine, ensure you have the Flutter SDK installed. If you are on Windows, you must have Developer Mode enabled to support plugin symlinks.
+​
+
+Clone the repository:
+
+bash
+git clone https://github.com/PoramaChowdhury/os_fifo_page_replacement_algo.git
+Install dependencies:
+
+bash
+flutter pub get
+Run the application:
+
+bash
+flutter run
