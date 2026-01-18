@@ -757,75 +757,175 @@ class _FifoHomeState extends State<FifoHome> {
   //     ],
   //   ),
   // );
-  Widget _buildTopBar(bool isMobile) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-    child: isMobile
-        ? Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(icon: const Icon(Icons.history), onPressed: _showHistoryList),
-            const Text("FIFO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-            IconButton(icon: const Icon(Icons.logout), onPressed: () => Supabase.instance.client.auth.signOut()),
-          ],
-        ),
-      ],
-    )
-        : Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(icon: const Icon(Icons.history), onPressed: _showHistoryList),
-        Column(
-          children: [
-            ShaderMask(
-              shaderCallback: (bounds) {
-                return LinearGradient(
-                  colors: [
-                    Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                  ],
-                ).createShader(bounds);
-              },
-              child: Text(
-                "PAGE REPLACEMENT ALGORITHM",
-                style: GoogleFonts.ubuntu(
-                  letterSpacing: 4,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 28,
-                  color: Colors.white, // required for ShaderMask
+  ///resnponsive but issue in phone
+
+  // Widget _buildTopBar(bool isMobile) => Padding(
+  //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  //   child: isMobile
+  //       ? Column(
+  //     children: [
+  //       Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           IconButton(icon: const Icon(Icons.history), onPressed: _showHistoryList),
+  //           const Text("FIFO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+  //           IconButton(icon: const Icon(Icons.logout), onPressed: () => Supabase.instance.client.auth.signOut()),
+  //         ],
+  //       ),
+  //     ],
+  //   )
+  //       : Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       IconButton(icon: const Icon(Icons.history), onPressed: _showHistoryList),
+  //       Column(
+  //         children: [
+  //           ShaderMask(
+  //             shaderCallback: (bounds) {
+  //               return LinearGradient(
+  //                 colors: [
+  //                   Theme.of(context).colorScheme.primary,
+  //                   Theme.of(context).colorScheme.primary.withOpacity(0.7),
+  //                 ],
+  //               ).createShader(bounds);
+  //             },
+  //             child: Text(
+  //               "PAGE REPLACEMENT ALGORITHM",
+  //               style: GoogleFonts.ubuntu(
+  //                 letterSpacing: 4,
+  //                 fontWeight: FontWeight.w700,
+  //                 fontSize: 28,
+  //                 color: Colors.white, // required for ShaderMask
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             "FIFO",
+  //             style: GoogleFonts.oswald(
+  //               color: Theme.of(context).colorScheme.primary,
+  //               fontWeight: FontWeight.w900,
+  //               fontSize: 26,
+  //               letterSpacing: 4,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       Row(
+  //         children: [
+  //           IconButton(icon: const Icon(Icons.play_circle_outline), onPressed: () {
+  //             Navigator.push(context, MaterialPageRoute(builder: (_) => const FifoVideoTutorial()));
+  //           }),
+  //           Consumer<ThemeService>(
+  //             builder: (_, theme, __) => IconButton(
+  //               icon: Icon(theme.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+  //               onPressed: theme.toggleTheme,
+  //             ),
+  //           ),
+  //           IconButton(icon: const Icon(Icons.logout), onPressed: () => Supabase.instance.client.auth.signOut()),
+  //         ],
+  //       ),
+  //     ],
+  //   ),
+  // );
+
+  ///fixed for phpone
+  Widget _buildTopBar(bool isMobile) {
+    final double titleFontSize = isMobile ? 16 : 28;
+    final double subTitleFontSize = isMobile ? 14 : 26;
+    final double letterSpacing = isMobile ? 2 : 4;
+    final double iconSize = isMobile ? 22 : 26;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          /// LEFT ICON
+          IconButton(
+            iconSize: iconSize,
+            icon: const Icon(Icons.history),
+            onPressed: _showHistoryList,
+          ),
+
+          /// CENTER TITLE
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ShaderMask(
+                  shaderCallback: (bounds) {
+                    return LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                      ],
+                    ).createShader(bounds);
+                  },
+                  child: Text(
+                    "PAGE REPLACEMENT ALGORITHM",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.ubuntu(
+                      letterSpacing: letterSpacing,
+                      fontWeight: FontWeight.w700,
+                      fontSize: titleFontSize,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "FIFO",
+                  style: GoogleFonts.oswald(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                    fontSize: subTitleFontSize,
+                    letterSpacing: letterSpacing,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// RIGHT ICONS
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isMobile)
+                IconButton(
+                  iconSize: iconSize,
+                  icon: const Icon(Icons.play_circle_outline),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const FifoVideoTutorial()),
+                    );
+                  },
+                ),
+              Consumer<ThemeService>(
+                builder: (_, theme, __) => IconButton(
+                  iconSize: iconSize,
+                  icon: Icon(
+                    theme.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  ),
+                  onPressed: theme.toggleTheme,
                 ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              "FIFO",
-              style: GoogleFonts.oswald(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w900,
-                fontSize: 26,
-                letterSpacing: 4,
+              IconButton(
+                iconSize: iconSize,
+                icon: const Icon(Icons.logout),
+                onPressed: () =>
+                    Supabase.instance.client.auth.signOut(),
               ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            IconButton(icon: const Icon(Icons.play_circle_outline), onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const FifoVideoTutorial()));
-            }),
-            Consumer<ThemeService>(
-              builder: (_, theme, __) => IconButton(
-                icon: Icon(theme.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-                onPressed: theme.toggleTheme,
-              ),
-            ),
-            IconButton(icon: const Icon(Icons.logout), onPressed: () => Supabase.instance.client.auth.signOut()),
-          ],
-        ),
-      ],
-    ),
-  );
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatusBanner() => Container(
     width: double.infinity,
     padding: const EdgeInsets.symmetric(vertical: 6),
