@@ -7,8 +7,9 @@ plugins {
 
 android {
     namespace = "com.example.fifo_page_replacemnt"
-    compileSdk = 35
-    ndkVersion = 27.0.14206865
+    compileSdk = 36
+    ndkVersion = "29.0.14206865"
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

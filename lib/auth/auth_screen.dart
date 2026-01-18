@@ -146,6 +146,7 @@
 // }
 import 'dart:async';
 import 'package:fifo_page_replacemnt/app/theme_service.dart';
+import 'package:fifo_page_replacemnt/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -223,125 +224,135 @@ class _AuthScreenState extends State<AuthScreen> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-
+    final isMobile = Responsive.isMobile(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            width: 520,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: cs.onSurface.withOpacity(0.12),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 🔥 HEADER + THEME TOGGLE
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return
+          Center(
+            child: SingleChildScrollView(
+              child: Container(
+                // width: 520,
+                width: isMobile ? double.infinity : 520,
+                margin: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 0),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: cs.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: cs.onSurface.withOpacity(0.12),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      isLogin ? "LOGIN" : "SIGN UP",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 3,
-                        color: cs.onSurface,
+                    // 🔥 HEADER + THEME TOGGLE
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isLogin ? "LOGIN" : "SIGN UP",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 3,
+                            color: cs.onSurface,
+                          ),
+                        ),
+                        Consumer<ThemeService>(
+                          builder: (_, themeService, __) =>
+                              IconButton(
+                                tooltip: "Toggle theme",
+                                icon: Icon(
+                                  themeService.isDarkMode
+                                      ? Icons.light_mode
+                                      : Icons.dark_mode,
+                                  color: cs.onSurface.withOpacity(0.7),
+                                ),
+                                onPressed: themeService.toggleTheme,
+                              ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    TextField(
+                      controller: _email,
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        labelStyle: TextStyle(color: cs.onSurface.withOpacity(
+                            0.7)),
                       ),
                     ),
-                    Consumer<ThemeService>(
-                      builder: (_, themeService, __) => IconButton(
-                        tooltip: "Toggle theme",
-                        icon: Icon(
-                          themeService.isDarkMode
-                              ? Icons.light_mode
-                              : Icons.dark_mode,
-                          color: cs.onSurface.withOpacity(0.7),
-                        ),
-                        onPressed: themeService.toggleTheme,
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _pass,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        labelStyle: TextStyle(color: cs.onSurface.withOpacity(
+                            0.7)),
                       ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    if (isLoading)
+                      CircularProgressIndicator(color: cs.primary)
+                    else
+                      ElevatedButton(
+                        onPressed: _handleAuth,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.black,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: Text(isLogin ? "Sign In" : "Create Account"),
+                      ),
+
+                    const SizedBox(height: 10),
+
+                    TextButton(
+                      onPressed: () async {
+                        if (_email.text.isEmpty) {
+                          return _showStatus(
+                            "Enter email first",
+                            isError: true,
+                          );
+                        }
+                        await Supabase.instance.client.auth
+                            .resetPasswordForEmail(_email.text.trim());
+                        _showStatus("Reset link sent to inbox.");
+                      },
+                      child: Text("Forgot Credentials?", style: TextStyle(
+                        color: Color(0xFF038585),
+
+                      ),),
+                    ),
+
+                    TextButton(
+                      onPressed: () =>
+                          setState(() => isLogin = !isLogin),
+                      child: Text(
+                        isLogin ? "Create Account" : "Back to Login",
+                      ),
+                    ),
+
+                    const Divider(),
+
+                    TextButton(
+                      onPressed: () =>
+                          Supabase.instance.client.auth.signInAnonymously(),
+                      child: const Text("Continue as Guest"),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 24),
-
-                TextField(
-                  controller: _email,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.7)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _pass,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.7)),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                if (isLoading)
-                  CircularProgressIndicator(color: cs.primary)
-                else
-                  ElevatedButton(
-                    onPressed: _handleAuth,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.black,
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: Text(isLogin ? "Sign In" : "Create Account"),
-                  ),
-
-                const SizedBox(height: 10),
-
-                TextButton(
-                  onPressed: () async {
-                    if (_email.text.isEmpty) {
-                      return _showStatus(
-                        "Enter email first",
-                        isError: true,
-                      );
-                    }
-                    await Supabase.instance.client.auth
-                        .resetPasswordForEmail(_email.text.trim());
-                    _showStatus("Reset link sent to inbox.");
-                  },
-                  child:  Text("Forgot Credentials?",style: TextStyle(
-                    color: Color(0xFF038585),
-
-                  ),),
-                ),
-
-                TextButton(
-                  onPressed: () =>
-                      setState(() => isLogin = !isLogin),
-                  child: Text(
-                    isLogin ? "Create Account" : "Back to Login",
-                  ),
-                ),
-
-                const Divider(),
-
-                TextButton(
-                  onPressed: () =>
-                      Supabase.instance.client.auth.signInAnonymously(),
-                  child: const Text("Continue as Guest"),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        }
       ),
     );
   }

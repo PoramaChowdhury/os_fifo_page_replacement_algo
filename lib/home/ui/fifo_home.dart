@@ -445,6 +445,7 @@ import 'package:fifo_page_replacemnt/fifo%20calculator/fifo_logic.dart';
 import 'package:fifo_page_replacemnt/home/widgets/fifo_memory.dart';
 import 'package:fifo_page_replacemnt/model/fifo_model.dart';
 import 'package:fifo_page_replacemnt/home/widgets/fifo_stats_dashboard_widgets.dart';
+import 'package:fifo_page_replacemnt/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -615,13 +616,14 @@ class _FifoHomeState extends State<FifoHome> {
 
     final int uniquePages =
         pages.map(int.tryParse).whereType<int>().toSet().length;
-
+    final isMobile = Responsive.isMobile(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            _buildTopBar(),
+            // _buildTopBar(),
+            _buildTopBar(isMobile),
             FifoInputPanel(
               formKey: _formKey,
               pageController: _pageController,
@@ -648,7 +650,8 @@ class _FifoHomeState extends State<FifoHome> {
                 primaryColor: primaryColor,
               ),
             ),
-            _buildMediaConsole(),
+            // _buildMediaConsole(),
+            _buildMediaConsole(isMobile),
           ],
         ),
       ),
@@ -657,21 +660,122 @@ class _FifoHomeState extends State<FifoHome> {
 
   /* ---------------- UI PIECES ---------------- */
 
-  Widget _buildTopBar() => Padding(
+  // Widget _buildTopBar() => Padding(
+  //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  //   child: Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       IconButton(
+  //         icon: Icon(
+  //           Icons.history,
+  //           color: Theme.of(context)
+  //               .colorScheme
+  //               .onSurface
+  //               .withOpacity(0.7),
+  //         ),
+  //         onPressed: _showHistoryList,
+  //       ),
+  //       Column(
+  //         children: [
+  //           ShaderMask(
+  //             shaderCallback: (bounds) {
+  //               return LinearGradient(
+  //                 colors: [
+  //                   Theme.of(context).colorScheme.primary,
+  //                   Theme.of(context).colorScheme.primary.withOpacity(0.7),
+  //                 ],
+  //               ).createShader(bounds);
+  //             },
+  //             child: Text(
+  //               "PAGE REPLACEMENT ALGORITHM",
+  //               style: GoogleFonts.ubuntu(
+  //                 letterSpacing: 4,
+  //                 fontWeight: FontWeight.w700,
+  //                 fontSize: 28,
+  //                 color: Colors.white, // required for ShaderMask
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 2),
+  //           Text(
+  //             "FIFO",
+  //             style: GoogleFonts.oswald(
+  //               color: Theme.of(context).colorScheme.primary,
+  //               fontWeight: FontWeight.w900,
+  //               fontSize: 26,
+  //               letterSpacing: 4,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       Row(
+  //         children: [
+  //           IconButton(
+  //             icon: Icon(
+  //               Icons.play_circle_outline,
+  //               color: Theme.of(context)
+  //                   .colorScheme
+  //                   .onSurface
+  //                   .withOpacity(0.7),
+  //             ),
+  //             onPressed: () {
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (_) => const FifoVideoTutorial(),
+  //                 ),
+  //               );
+  //             },
+  //           ),
+  //           Consumer<ThemeService>(
+  //             builder: (_, theme, __) => IconButton(
+  //               icon: Icon(
+  //                 theme.isDarkMode
+  //                     ? Icons.light_mode
+  //                     : Icons.dark_mode,
+  //                 color: Theme.of(context)
+  //                     .colorScheme
+  //                     .onSurface
+  //                     .withOpacity(0.7),
+  //               ),
+  //               onPressed: theme.toggleTheme,
+  //             ),
+  //           ),
+  //           IconButton(
+  //             icon: Icon(
+  //               Icons.logout,
+  //               color: Theme.of(context)
+  //                   .colorScheme
+  //                   .onSurface
+  //                   .withOpacity(0.7),
+  //             ),
+  //             onPressed: () =>
+  //                 Supabase.instance.client.auth.signOut(),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   ),
+  // );
+  Widget _buildTopBar(bool isMobile) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-    child: Row(
+    child: isMobile
+        ? Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(icon: const Icon(Icons.history), onPressed: _showHistoryList),
+            const Text("FIFO", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            IconButton(icon: const Icon(Icons.logout), onPressed: () => Supabase.instance.client.auth.signOut()),
+          ],
+        ),
+      ],
+    )
+        : Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        IconButton(
-          icon: Icon(
-            Icons.history,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withOpacity(0.7),
-          ),
-          onPressed: _showHistoryList,
-        ),
+        IconButton(icon: const Icon(Icons.history), onPressed: _showHistoryList),
         Column(
           children: [
             ShaderMask(
@@ -707,54 +811,21 @@ class _FifoHomeState extends State<FifoHome> {
         ),
         Row(
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.play_circle_outline,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacity(0.7),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const FifoVideoTutorial(),
-                  ),
-                );
-              },
-            ),
+            IconButton(icon: const Icon(Icons.play_circle_outline), onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const FifoVideoTutorial()));
+            }),
             Consumer<ThemeService>(
               builder: (_, theme, __) => IconButton(
-                icon: Icon(
-                  theme.isDarkMode
-                      ? Icons.light_mode
-                      : Icons.dark_mode,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withOpacity(0.7),
-                ),
+                icon: Icon(theme.isDarkMode ? Icons.light_mode : Icons.dark_mode),
                 onPressed: theme.toggleTheme,
               ),
             ),
-            IconButton(
-              icon: Icon(
-                Icons.logout,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacity(0.7),
-              ),
-              onPressed: () =>
-                  Supabase.instance.client.auth.signOut(),
-            ),
+            IconButton(icon: const Icon(Icons.logout), onPressed: () => Supabase.instance.client.auth.signOut()),
           ],
         ),
       ],
     ),
   );
-
   Widget _buildStatusBanner() => Container(
     width: double.infinity,
     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -772,47 +843,90 @@ class _FifoHomeState extends State<FifoHome> {
     ),
   );
 
-  Widget _buildMediaConsole() => FifoWidgets.glassContainer(
+  // Widget _buildMediaConsole() => FifoWidgets.glassContainer(
+  //   margin: const EdgeInsets.all(20),
+  //   child: Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       _mediaBtn(Icons.first_page, () {
+  //         visibleSteps.clear();
+  //         currentStep = 0;
+  //       }),
+  //       _mediaBtn(Icons.chevron_left, prevStep),
+  //       const SizedBox(width: 15),
+  //       GestureDetector(
+  //         onTap: () {
+  //           if (isPlaying) {
+  //             playTimer?.cancel();
+  //             setState(() => isPlaying = false);
+  //           } else {
+  //             if (currentStep >= allSteps.length) {
+  //               visibleSteps.clear();
+  //               currentStep = 0;
+  //             }
+  //             setState(() => isPlaying = true);
+  //             playTimer = Timer.periodic(
+  //               const Duration(seconds: 1),
+  //                   (_) => nextStep(),
+  //             );
+  //           }
+  //         },
+  //         child: CircleAvatar(
+  //           radius: 25,
+  //           backgroundColor: primaryColor,
+  //           child: Icon(
+  //             isPlaying ? Icons.pause : Icons.play_arrow,
+  //             color: Colors.black,
+  //           ),
+  //         ),
+  //       ),
+  //       const SizedBox(width: 15),
+  //       _mediaBtn(Icons.chevron_right, nextStep),
+  //       _mediaBtn(Icons.last_page, skipToEnd),
+  //     ],
+  //   ),
+  // );
+  Widget _buildMediaConsole(bool isMobile) => FifoWidgets.glassContainer(
     margin: const EdgeInsets.all(20),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+      children: isMobile
+          ? [
+        _mediaBtn(Icons.chevron_left, prevStep),
+        _playBtn(),
+        _mediaBtn(Icons.chevron_right, nextStep),
+      ]
+          : [
         _mediaBtn(Icons.first_page, () {
           visibleSteps.clear();
           currentStep = 0;
         }),
         _mediaBtn(Icons.chevron_left, prevStep),
-        const SizedBox(width: 15),
-        GestureDetector(
-          onTap: () {
-            if (isPlaying) {
-              playTimer?.cancel();
-              setState(() => isPlaying = false);
-            } else {
-              if (currentStep >= allSteps.length) {
-                visibleSteps.clear();
-                currentStep = 0;
-              }
-              setState(() => isPlaying = true);
-              playTimer = Timer.periodic(
-                const Duration(seconds: 1),
-                    (_) => nextStep(),
-              );
-            }
-          },
-          child: CircleAvatar(
-            radius: 25,
-            backgroundColor: primaryColor,
-            child: Icon(
-              isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        const SizedBox(width: 15),
+        _playBtn(),
         _mediaBtn(Icons.chevron_right, nextStep),
         _mediaBtn(Icons.last_page, skipToEnd),
       ],
+    ),
+  );
+
+  Widget _playBtn() => GestureDetector(
+    onTap: () {
+      if (isPlaying) {
+        playTimer?.cancel();
+        setState(() => isPlaying = false);
+      } else {
+        if (currentStep >= allSteps.length) {
+          visibleSteps.clear();
+          currentStep = 0;
+        }
+        setState(() => isPlaying = true);
+        playTimer = Timer.periodic(const Duration(seconds: 1), (_) => nextStep());
+      }
+    },
+    child: CircleAvatar(
+      radius: 25,
+      backgroundColor: primaryColor,
+      child: Icon(isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.black),
     ),
   );
 

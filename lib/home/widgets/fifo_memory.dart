@@ -101,6 +101,7 @@
 // }
 
 import 'package:fifo_page_replacemnt/model/fifo_model.dart';
+import 'package:fifo_page_replacemnt/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'fifo_widgets.dart';
 
@@ -155,7 +156,8 @@ class FifoMemoryGrid extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Container(
-      width: 70,
+      // width: 70,
+      width: Responsive.isMobile(context) ? 60 : 70,
       margin: const EdgeInsets.only(right: 15),
       child: Column(
         children: [
