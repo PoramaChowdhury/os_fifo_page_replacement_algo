@@ -22,80 +22,86 @@ class FifoInputPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: FifoWidgets.glassContainer(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Page String Input
-            Expanded(
-              flex: 4,
-              child: TextFormField(
-                controller: pageController,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9\s]')),
-                ],
-                decoration: const InputDecoration(
-                  labelText: "PAGE STRING (Ex - 1 2 4 6 9)"),
-                validator: (val) =>
-                (val == null || val.isEmpty) ? "Please enter numbers" : null,
-              ),
-            ),
-            const SizedBox(width: 20),
-            // Frames Input
-            Expanded(
-              child: TextFormField(
-                controller: frameController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isMobile = constraints.maxWidth < 700;
 
-                decoration: const InputDecoration(
-                    labelText: "Frames"),
-                validator: (val) =>
-                (val == null || val.isEmpty) ? "Required" : null,
-              ),
-            ),
-            const SizedBox(width: 15),
-            // Run Button
-            FifoWidgets.largeActionButton(
-              icon: Icons.bolt,
-              color: primaryColor,
-              onPressed: onCalculate,
-              tooltip: "Run Simulator",
-            ),
-            const SizedBox(width: 10),
-            // Reset Button
-            FifoWidgets.largeActionButton(
-              icon: Icons.refresh_rounded,
-              color: Colors.redAccent,
-              onPressed: onClear,
-              tooltip: "System Reset",
-            ),
-          ],
-        ),
-      ),
+        return Form(
+          key: formKey,
+          child: FifoWidgets.glassContainer(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
+          ),
+        );
+      },
     );
   }
 
-  // InputDecoration _inputStyle(String label) => InputDecoration(
-  //   labelText: label,
-  //   labelStyle: const TextStyle(
-  //     color: Colors.white38,
-  //     fontSize: 13,
-  //     letterSpacing: 1.2,
-  //   ),
-  //   contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-  //   enabledBorder: OutlineInputBorder(
-  //     borderSide: const BorderSide(color: Colors.white10),
-  //     borderRadius: BorderRadius.circular(12),
-  //   ),
-  //   focusedBorder: OutlineInputBorder(
-  //     borderSide: BorderSide(color: primaryColor, width: 2),
-  //     borderRadius: BorderRadius.circular(12),
-  //   ),
-  //   filled: true,
-  //   fillColor: Colors.white.withOpacity(0.02),
-  // );
+
+  Widget _buildMobileLayout() {
+    return Column(
+      children: [
+        Row(children: [Expanded(child: _pageInput())]),
+        const SizedBox(height: 15),
+        Row(
+          children: [
+            Expanded(child: _frameInput()),
+            const SizedBox(width: 12),
+            _runButton(),
+            const SizedBox(width: 10),
+            _resetButton(),
+          ],
+        ),
+      ],
+    );
+  }
+
+
+  Widget _buildDesktopLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(flex: 4, child: _pageInput()),
+        const SizedBox(width: 20),
+        Expanded(child: _frameInput()),
+        const SizedBox(width: 15),
+        _runButton(),
+        const SizedBox(width: 10),
+        _resetButton(),
+      ],
+    );
+  }
+
+
+  Widget _pageInput() => TextFormField(
+    controller: pageController,
+    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9\s]'))],
+    decoration: const InputDecoration(
+      labelText: "PAGE STRING (Ex - 1 2 4 6 9)",
+    ),
+    validator: (val) =>
+        (val == null || val.isEmpty) ? "Please enter numbers" : null,
+  );
+
+  Widget _frameInput() => TextFormField(
+    controller: frameController,
+    keyboardType: TextInputType.number,
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    decoration: const InputDecoration(labelText: "Frames"),
+    validator: (val) => (val == null || val.isEmpty) ? "Required" : null,
+  );
+
+  Widget _runButton() => FifoWidgets.largeActionButton(
+    icon: Icons.bolt,
+    color: primaryColor,
+    onPressed: onCalculate,
+    tooltip: "Run Simulator",
+  );
+
+  Widget _resetButton() => FifoWidgets.largeActionButton(
+    icon: Icons.refresh_rounded,
+    color: Colors.redAccent,
+    onPressed: onClear,
+    tooltip: "System Reset",
+  );
 }

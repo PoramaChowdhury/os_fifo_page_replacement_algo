@@ -1,69 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'fifo_widgets.dart';
-//
-// class FifoHistorySheet extends StatelessWidget {
-//   final Color bgDark;
-//   final Color primaryColor;
-//   final Function(String pages, String frames) onHistorySelected;
-//
-//   const FifoHistorySheet({
-//     super.key,
-//     required this.bgDark,
-//     required this.primaryColor,
-//     required this.onHistorySelected,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final user = Supabase.instance.client.auth.currentUser;
-//
-//     return FifoWidgets.glassContainer(
-//       margin: EdgeInsets.zero,
-//       child: StreamBuilder<List<Map<String, dynamic>>>(
-//         stream: Supabase.instance.client
-//             .from('history')
-//             .stream(primaryKey: ['id'])
-//             .eq('user_id', user?.id ?? '')
-//             .order('created_at'),
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return const Center(child: CircularProgressIndicator());
-//           }
-//
-//           final history = snapshot.data ?? [];
-//           if (history.isEmpty) {
-//             return const Center(
-//               child: Text("NO HISTORY FOUND", style: TextStyle(color: Colors.white24)),
-//             );
-//           }
-//
-//           return ListView.builder(
-//             itemCount: history.length,
-//             itemBuilder: (ctx, i) => ListTile(
-//               leading: Icon(Icons.history, color: primaryColor),
-//               title: Text(
-//                 "Pages: ${history[i]['pages']}",
-//                 style: const TextStyle(fontSize: 23, color: Colors.white70),
-//               ),
-//               subtitle: Text(
-//                 "Frames: ${history[i]['frame_count']}",
-//                 style: const TextStyle(fontSize: 20, color: Colors.white24),
-//               ),
-//               onTap: () {
-//                 onHistorySelected(
-//                   history[i]['pages'].toString(),
-//                   history[i]['frame_count'].toString(),
-//                 );
-//                 Navigator.pop(context);
-//               },
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'fifo_widgets.dart';
@@ -95,9 +29,7 @@ class FifoHistorySheet extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: CircularProgressIndicator(
-                color: colorScheme.primary,
-              ),
+              child: CircularProgressIndicator(color: colorScheme.primary),
             );
           }
 
@@ -120,10 +52,7 @@ class FifoHistorySheet extends StatelessWidget {
             itemCount: history.length,
             itemBuilder: (ctx, i) {
               return ListTile(
-                leading: Icon(
-                  Icons.history,
-                  color: primaryColor,
-                ),
+                leading: Icon(Icons.history, color: primaryColor),
                 title: Text(
                   "Pages: ${history[i]['pages']}",
                   style: TextStyle(

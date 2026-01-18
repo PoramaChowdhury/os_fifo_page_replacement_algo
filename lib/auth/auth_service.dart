@@ -1,6 +1,5 @@
 import 'package:fifo_page_replacemnt/auth/auth_screen.dart';
 import 'package:fifo_page_replacemnt/home/ui/fifo_home.dart';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -23,5 +22,3 @@ class AuthGate extends StatelessWidget {
     );
   }
 }
-
-
